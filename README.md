@@ -8,3 +8,5 @@ WORK ONLY ON : WINDOWS 7/8/10
 AND ARTIFICE(if your ti-OS is superior to 5.0): https://yvantt.github.io/arTIfiCE/
 
 THE .8XP IS GENERATED IN `8xp-progs`
+
+WARNING : `makeVpy.exe` is not usable out of usage
