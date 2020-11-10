@@ -11,9 +11,9 @@ THE .8XP IS GENERATED IN `8xp-progs`
 
 USE `convert.py` to generate everything needed and convert it (the conversion is automatic and degrade video to 25x25 picture , else it will be too big)
 
-WARNING : `makeVpy.exe` is not usable out of usage
+*WARNING : `makeVpy.exe` is not usable out of usage*
 
-Credits :
+## Credits :
 
 Toolchain for `makeVpy.exe` : https://github.com/CE-Programming/toolchain
 
