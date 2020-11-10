@@ -1,7 +1,7 @@
 # TIGIF
 A software to convert .mp4 , .mov and .mkv to .8xp 
 
-REQUIRES CLIBS LIBRARY : https://github.com/CE-Programming/libraries/releases/tag/v8.8
+REQUIRES CLIBS LIBRARY ON YOUYR TI : https://github.com/CE-Programming/libraries/releases/tag/v8.8
 
 WORK ONLY ON : WINDOWS 7/8/10
 
