@@ -13,6 +13,8 @@ USE `convert.py` to generate everything needed and convert it (the conversion is
 
 *WARNING : `makeVpy.exe` is not usable out of usage*
 
+`makeVpy.exe` was modified by me for the usage of TIGIF 
+
 ## Credits :
 
 Toolchain for `makeVpy.exe` : https://github.com/CE-Programming/toolchain
