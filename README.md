@@ -13,7 +13,7 @@ USE `convert.py` to generate everything needed and convert it (the conversion is
 
 *WARNING : `makeVpy.exe` is not usable out of usage*
 
-`makeVpy.exe` was modified by me for the usage of TIGIF(source code and credits at ## Credits)
+`makeVpy.exe` was modified by me for the usage of TIGIF(source code and credits at https://github.com/alexdieu/TIGIF#credits-)
 
 ## Credits :
 
