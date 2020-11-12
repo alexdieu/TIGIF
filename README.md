@@ -1,3 +1,4 @@
+[![windows status](https://github.com/mateoconlechuga/convimg/workflows/windows/badge.svg)](https://github.com/mateoconlechuga/convimg/actions?query=workflow%3Awindows)
 # TIGIF
 A software to convert .mp4 , .mov and .mkv to .8xp 
 
