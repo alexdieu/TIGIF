@@ -27,3 +27,19 @@ THIS IS BECAUSE YOU HAVE TO EMPTY 8xp directory , anyways you can get you progra
 Toolchain for `makeVpy.exe` : https://github.com/CE-Programming/toolchain
 
 Convimg for Image palette quantization : https://github.com/mateoconlechuga/convimg
+
+## RESULTS :
+
+**STARING GIF :**
+
+![start](https://github.com/alexdieu/TIGIF/blob/main/gifDemo.gif)
+
+*OPTIONS :
+`
+RESOLUTION_OF_GIF = 64
+SCALE = 4
+`
+
+**RESULT :**
+
+![start](https://github.com/alexdieu/TIGIF/blob/main/gifDemoR.gif)
