@@ -133,7 +133,7 @@ MAIN.write(startcode)
 print("[INFO] Writting main.c")
 debug.append("[INFO] Writting main.c")
 for i in range(0, count):
-    MAIN.write("        gfx_Sprite_NoClip(ti%s, 160, 140);\n" % i)
+    MAIN.write("        gfx_ScaledSprite_NoClip(ti%s, 25, 15, 8, 8);\n" % i)
     MAIN.write("        delay(40);\n")
 MAIN.write(ende)
 MAIN.close()
