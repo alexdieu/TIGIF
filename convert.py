@@ -12,6 +12,8 @@ count = 0
 
 origi = os.getcwd()
 
+g = 64
+
 now = datetime.datetime.now()
 debug = []
 
@@ -48,7 +50,7 @@ for i in range(0, count):
     try:
         debug.append("[INFO] Resizing Image %d.png to (25x25)" % i)
         img = Image.open("imgs//ti%s.png" % i)
-        img = img.resize((25, 25), PIL.Image.ANTIALIAS)
+        img = img.resize((g, g), PIL.Image.ANTIALIAS)
         img.save("imgs//ti%s.png" % i)
     except:
         print("[WARNING] COULD NOT CONVERT ti%d.png to (25x25)!" % i)
