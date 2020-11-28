@@ -14,6 +14,7 @@ origi = os.getcwd()
 
 RESOLUTION_OF_GIF = 25
 SCALE = 8
+NAME_OF_PROG = "TIGIF"
 
 
 now = datetime.datetime.now()
@@ -50,6 +51,7 @@ video_to_frames(video, "imgs")
 
 g = RESOLUTION_OF_GIF
 f = SCALE
+v = NAME_OF_PROG
 
 for i in range(0, count):
     try:
@@ -146,7 +148,7 @@ MAIN.write(ende)
 MAIN.close()
 
 makefile = open("build//makefile", "w")
-makef = '''NAME        ?= TIGIF
+makef = f'''NAME        ?= {v}
 COMPRESSED  ?= NO
 ICON        ?= icon.png
 DESCRIPTION ?= "TIGIF BY ALEXDIEU FOR TI83PCE/84PCE"'''
