@@ -34,7 +34,7 @@ Convimg for Image palette quantization : https://github.com/mateoconlechuga/conv
 
 ![start](https://github.com/alexdieu/TIGIF/blob/main/gifDemo.gif)
 
-*OPTIONS :
+*OPTIONS :*
 `
 RESOLUTION_OF_GIF = 64
 SCALE = 4
