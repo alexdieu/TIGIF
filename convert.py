@@ -12,7 +12,7 @@ count = 0
 
 origi = os.getcwd()
 
-g = 64
+g = 25
 
 now = datetime.datetime.now()
 debug = []
