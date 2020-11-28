@@ -12,7 +12,9 @@ count = 0
 
 origi = os.getcwd()
 
-g = 25
+RESOLUTION_OF_GIF = 25
+SCALE = 8
+
 
 now = datetime.datetime.now()
 debug = []
@@ -45,6 +47,9 @@ def video_to_frames(video, path_output_dir):
     vidcap.release()
 
 video_to_frames(video, "imgs")
+
+g = RESOLUTION_OF_GIF
+f = SCALE
 
 for i in range(0, count):
     try:
@@ -135,7 +140,7 @@ MAIN.write(startcode)
 print("[INFO] Writting main.c")
 debug.append("[INFO] Writting main.c")
 for i in range(0, count):
-    MAIN.write("        gfx_ScaledSprite_NoClip(ti%s, 25, 15, 8, 8);\n" % i)
+    MAIN.write("        gfx_ScaledSprite_NoClip(ti%s, 25, 15, %d, %d);\n" % (i, f, f))
     MAIN.write("        delay(40);\n")
 MAIN.write(ende)
 MAIN.close()
