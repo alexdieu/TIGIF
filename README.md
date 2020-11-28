@@ -15,7 +15,7 @@ USE `convert.py` to generate everything needed and convert it (the conversion is
 
 `makeVpy.exe` was modified by me for the usage of TIGIF(source code and credits at https://github.com/alexdieu/TIGIF#credits-)
 
-IF U GOT `makeVpy.exe: *** [bin/TIGIF.8xp] Error 1` THIS MEANS THAT YOUR GIF IS TOO LONG
+IF U GOT `makeVpy.exe: *** [bin/TIGIF.8xp] Error 1` THIS MEANS THAT YOUR GIF IS TOO LONG OR HAS TOO MUCH FRAMES (25 FPS MAX)
 
 ## Credits :
 
