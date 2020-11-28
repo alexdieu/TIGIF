@@ -9,7 +9,7 @@ AND ARTIFICE(if your ti-OS is superior to 5.5): https://yvantt.github.io/arTIfiC
 
 THE .8XP IS GENERATED IN `8xp-progs`
 
-USE `convert.py` to generate everything needed and convert it (the conversion is automatic and degrade video to 25x25 picture , else it would be too big)
+USE `convert.py` to generate everything needed and convert it (the conversion is automatic and degrade video to 25x25(in THEORY it could go to 64x64 for vid less than 3-4sec) picture , else it would be too big)
 
 *WARNING : `makeVpy.exe` is not usable out of usage*
 
