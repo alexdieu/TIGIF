@@ -18,9 +18,9 @@ USE `convert.py` to generate everything needed and convert it (the conversion is
 
 IF U GOT `makeVpy.exe: *** [bin/TIGIF.8xp] Error 1` THIS MEANS THAT YOUR GIF IS TOO LONG OR HAS TOO MUCH FRAMES (25 FPS MAX)
 
-IF U GOT `[success] bin\TIGIF.8xp, 38165 bytes.
-          [ERROR] COMPILATION FAILED !`
-          THIS IS BECAUSE YOU HAVE TO EMPTY 8xp directory , anyways you can get you program at `TIGIF-main\build\bin`
+IF U GOT `[success] bin\TIGIF.8xp, 38165 bytes.                                                                                                                                               [ERROR] COMPILATION FAILED !`
+          
+THIS IS BECAUSE YOU HAVE TO EMPTY 8xp directory , anyways you can get you program at `TIGIF-main\build\bin`
 
 ## Credits :
 
