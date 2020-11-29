@@ -46,4 +46,4 @@ Convimg for Image palette quantization : https://github.com/mateoconlechuga/conv
 
 *NOTES : It's the recorder that is at 4 frames/sec ! the gif can be up to 25fps on your screen!*
 
-Try mutiples demos on your TI !
+Try mutiples demos on your TI (IN [releases](https://github.com/alexdieu/TIGIF/releases/tag/1) )
