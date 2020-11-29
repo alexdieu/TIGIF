@@ -12,9 +12,10 @@ count = 0
 
 origi = os.getcwd()
 
-RESOLUTION_OF_GIF = 25
-SCALE = 8
-NAME_OF_PROG = "TIGIF"
+RESOLUTION_OF_GIF = 25 # HIS RESOLUTION (here 25x25)
+SCALE = 8 # THE SIZE OF THE GIF OR VIDEO
+NAME_OF_PROG = "TIGIF" # NAME OF THE PROGRAM ON YOUR TI
+DELAY_BETWEEN_PICTURES = 40 #Delay between pictures in milliseconds . 40 is for 25 FPS .
 
 
 now = datetime.datetime.now()
@@ -133,6 +134,8 @@ int main(void)
 	while(kb_ScanGroup(kb_group_1) != kb_2nd) {
 '''
 
+k = DELAY_BETWEEN_PICTURES
+
 ende = '''		}
 		gfx_End();
 		prgm_CleanUp();
@@ -143,7 +146,7 @@ print("[INFO] Writting main.c")
 debug.append("[INFO] Writting main.c")
 for i in range(0, count):
     MAIN.write("        gfx_ScaledSprite_NoClip(ti%s, 25, 15, %d, %d);\n" % (i, f, f))
-    MAIN.write("        delay(40);\n")
+    MAIN.write(f"        delay({k});\n")
 MAIN.write(ende)
 MAIN.close()
 
