@@ -21,6 +21,7 @@ DELAY_BETWEEN_PICTURES = 40 #Delay between pictures in milliseconds . 40 is for 
 now = datetime.datetime.now()
 debug = []
 
+#REQUIREMENTS
 print("VIDEO TO .8XP BY ALEXDIEU FOR TI83 PCE/TI84PCE")
 print("VIDEO HAVE TO BE VERY SHORT : LESS THAN 20 SECONDS")
 print("This tool requires : ")
@@ -31,6 +32,7 @@ input("...")
 print("All these conditions are good ? Let's start ! Else go in Readme.md on github")
 video = input("video file ?\n")
 
+#GET ALL FRAMES OF THE GIF OR THE VID
 def video_to_frames(video, path_output_dir):
     global count
     vidcap = cv2.VideoCapture(video)
@@ -50,13 +52,15 @@ def video_to_frames(video, path_output_dir):
 
 video_to_frames(video, "imgs")
 
+#GETTTING NEW VAR NAMES
 g = RESOLUTION_OF_GIF
 f = SCALE
 v = NAME_OF_PROG
 
+#RESIZING LOW RESOLUTION FOR SPACE
 for i in range(0, count):
     try:
-        debug.append("[INFO] Resizing Image %d.png to (25x25)" % i)
+        debug.append(f"[INFO] Resizing Image %d.png to ({g}x{g})" % i)
         img = Image.open("imgs//ti%s.png" % i)
         img = img.resize((g, g), PIL.Image.ANTIALIAS)
         img.save("imgs//ti%s.png" % i)
@@ -64,6 +68,7 @@ for i in range(0, count):
         print("[WARNING] COULD NOT CONVERT ti%d.png to (25x25)!" % i)
         debug.append("[WARNING] COULD NOT CONVERT ti%d.png to (25x25) !" % i)
 
+#CONVERTING IMAGES TO BINARIES IN C
 def convimg(file):
         debug.append("[INFO] WRITTING CONVIMG.YAML")
         try:
@@ -92,13 +97,14 @@ def convimg(file):
             exit()
         configymaml.close
         
-
+#CONVERTING IMAGES
 convimg("imgs//convimg.yaml")
 working_dir = 'imgs'
 subprocess.check_call(['convimg.exe'], cwd=working_dir)
 
 files2 = os.listdir('imgs')
 
+#GET ALL FILES .H AND .C
 for i in files2:
     destination = "build//src//gfx"
     if '.h' in i or 'c' in i or 'gfx' in i:
@@ -114,6 +120,7 @@ for i in files2:
             shutil.move("imgs//%s" %i, destination)
     else:
         pass    
+#CODE FOR COMPILATION
 startcode = '''#include <tice.h>
 #include <graphx.h>
 #include <stdio.h>
@@ -145,11 +152,13 @@ MAIN.write(startcode)
 print("[INFO] Writting main.c")
 debug.append("[INFO] Writting main.c")
 for i in range(0, count):
+    #CODE FOR U R PICTURES
     MAIN.write("        gfx_ScaledSprite_NoClip(ti%s, 25, 15, %d, %d);\n" % (i, f, f))
     MAIN.write(f"        delay({k});\n")
 MAIN.write(ende)
 MAIN.close()
 
+#MAKING THE MAKEFILE
 makefile = open("build//makefile", "w")
 makef = f'''NAME        ?= {v}
 COMPRESSED  ?= NO
@@ -162,6 +171,7 @@ makefile.close()
 workdri = 'build'
 print("[INFO] BUIDLING ...")
 debug.append("[INFO] BUIDLING ...")
+#CALLING TO COMPILE THE PROGRAM TO BIN THEN TO 8XP
 subprocess.check_call(['makeVpy.exe'], cwd=workdri)
 
 BINARIES = "build//bin"
@@ -169,7 +179,8 @@ BINARIES = "build//bin"
 BINARIESLIST = os.listdir(BINARIES)
 
 debuge = open('DEBUG//DEBUG-LOG(%s_%s_%s).txt' % (now.minute, now.hour, now.day),'w')
-            
+       
+#GETTING THE 8XP AND MOVING IT
 for i in BINARIESLIST:
     destination = "8xp-progs"
     if ".8xp":
@@ -183,6 +194,7 @@ for i in BINARIESLIST:
             debuge.close()  
             exit()
 
+#WRITTING DEBUG
 print("[INFO] Writting debug log")
 debug.append("[INFO] Writting debug log")
 debug.append("[INFO] DONE")
