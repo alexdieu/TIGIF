@@ -172,7 +172,7 @@ workdri = 'build'
 print("[INFO] BUIDLING ...")
 debug.append("[INFO] BUIDLING ...")
 #CALLING TO COMPILE THE PROGRAM TO BIN THEN TO 8XP
-subprocess.check_call(['makeVpy.exe'], cwd=workdri)
+subprocess.check_call(['make2.exe'], cwd=workdri)
 
 BINARIES = "build//bin"
 
