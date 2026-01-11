@@ -1,205 +1,255 @@
+#!/usr/bin/env python3
+"""
+CONVERT.PY - Video to TI-83 Premium CE
+======================================
+FIRST VERSION - UPGRADE OF OLD GIT !
+"""
+
 import cv2
-import os,re, os.path
-from PIL import Image
-import PIL
-import datetime
-import shutil
+import numpy as np
+import os
+import sys
 import subprocess
-from shutil import Error as er
-from time import sleep as wait
+from pathlib import Path
 
-count = 0
+# Config
+FRAME_WIDTH = 40
+FRAME_HEIGHT = 30
+SCALE_FACTOR = 8
+MAX_SIZE = 60000
 
-origi = os.getcwd()
+def rgb332_convert(frame_bgr):
+    """
+    Convert BGR frame to RGB332 palette index.
+    
+    Index format:
+      Bits 7-5: Red   (3 bits)
+      Bits 4-2: Green (3 bits)
+      Bits 1-0: Blue  (2 bits)
+    """
+    b = frame_bgr[:, :, 0].astype(np.uint16)
+    g = frame_bgr[:, :, 1].astype(np.uint16)
+    r = frame_bgr[:, :, 2].astype(np.uint16)
+    
+    r3 = (r >> 5) & 0x07
+    g3 = (g >> 5) & 0x07
+    b2 = (b >> 6) & 0x03
+    
+    return ((r3 << 5) | (g3 << 2) | b2).astype(np.uint8)
 
-RESOLUTION_OF_GIF = 25 # HIS RESOLUTION (here 25x25)
-SCALE = 8 # THE SIZE OF THE GIF OR VIDEO
-NAME_OF_PROG = "TIGIF" # NAME OF THE PROGRAM ON YOUR TI
-DELAY_BETWEEN_PICTURES = 40 #Delay between pictures in milliseconds . 40 is for 25 FPS .
-
-
-now = datetime.datetime.now()
-debug = []
-
-#REQUIREMENTS
-print("VIDEO TO .8XP BY ALEXDIEU FOR TI83 PCE/TI84PCE")
-print("VIDEO HAVE TO BE VERY SHORT : LESS THAN 20 SECONDS")
-print("This tool requires : ")
-print("- BE ON WINDOWS 7/8/10")
-print("- Clibs library on your TI")
-print("- ARTIFICE if your ti os is superior to 5.0")
-input("...")
-print("All these conditions are good ? Let's start ! Else go in Readme.md on github")
-video = input("video file ?\n")
-
-#GET ALL FRAMES OF THE GIF OR THE VID
-def video_to_frames(video, path_output_dir):
-    global count
-    vidcap = cv2.VideoCapture(video)
-    count = 0
-    while vidcap.isOpened():
-        success, image = vidcap.read()
-        if success:
-            cv2.imwrite(os.path.join(path_output_dir, 'ti%d.png') % count, image)
-            count += 1
-            debug.append("[INFO] Succefully writed ti%d.png" % count)
-        else:
-            print("[WARNING] Failed to write ti%d.png" % count)
-            debug.append("[WARNING] Failed to write ti%d.png" % count)
+def extract_frames(video_path, max_frames):
+    """Extract video frames and convert to indexed."""
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"ERROR: Cannot open {video_path}")
+        return []
+    
+    total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    print(f"Video: {total} frames")
+    
+    bytes_per_frame = FRAME_WIDTH * FRAME_HEIGHT
+    max_possible = MAX_SIZE // bytes_per_frame
+    max_frames = min(max_frames or max_possible, max_possible)
+    print(f"Extracting up to {max_frames} frames at {FRAME_WIDTH}x{FRAME_HEIGHT}")
+    
+    frames = []
+    while len(frames) < max_frames:
+        ret, frame = cap.read()
+        if not ret:
             break
-    cv2.destroyAllWindows()
-    vidcap.release()
-
-video_to_frames(video, "imgs")
-
-#GETTTING NEW VAR NAMES
-g = RESOLUTION_OF_GIF
-f = SCALE
-v = NAME_OF_PROG
-
-#RESIZING LOW RESOLUTION FOR SPACE
-for i in range(0, count):
-    try:
-        debug.append(f"[INFO] Resizing Image %d.png to ({g}x{g})" % i)
-        img = Image.open("imgs//ti%s.png" % i)
-        img = img.resize((g, g), PIL.Image.ANTIALIAS)
-        img.save("imgs//ti%s.png" % i)
-    except:
-        print("[WARNING] COULD NOT CONVERT ti%d.png to (25x25)!" % i)
-        debug.append("[WARNING] COULD NOT CONVERT ti%d.png to (25x25) !" % i)
-
-#CONVERTING IMAGES TO BINARIES IN C
-def convimg(file):
-        debug.append("[INFO] WRITTING CONVIMG.YAML")
-        try:
-            configymaml = open(file,'w')
-            configymaml.write("output: c\n")
-            configymaml.write("  include-file: gfx.h\n")
-            configymaml.write("  palettes:\n")
-            configymaml.write("    - global_palette\n")
-            configymaml.write("  converts:\n")
-            configymaml.write("    - sprites\n")
-            configymaml.write("\n")
-            configymaml.write("palette: global_palette\n")
-            configymaml.write("  fixed-color: {index:0, r:255, g:0, b:128}\n")
-            configymaml.write("  fixed-color: {index:1, r:255, g:255, b:255}\n")
-            configymaml.write("  images: automatic\n")
-            configymaml.write("\n")
-            configymaml.write("convert: sprites\n")
-            configymaml.write("  palette: global_palette\n")
-            configymaml.write("  transparent-color-index: 0\n")
-            configymaml.write("  images:\n")
-            for i in range(0, count):
-                configymaml.write("    - ti%s.png\n" % i)
-        except:
-            print("[ERROR] COULD NOT WRITE CONVIMG.YAML ! ABORTING OPERATION ... [0!]" % i)
-            debug.append("[ERROR] COULD NOT WRITE CONVIMG.YAML ! ABORTING OPERATION ... [0!]" % i)
-            exit()
-        configymaml.close
         
-#CONVERTING IMAGES
-convimg("imgs//convimg.yaml")
-working_dir = 'imgs'
-subprocess.check_call(['convimg.exe'], cwd=working_dir)
+        resized = cv2.resize(frame, (FRAME_WIDTH, FRAME_HEIGHT), interpolation=cv2.INTER_AREA)
+        indexed = rgb332_convert(resized)
+        frames.append(indexed)
+        
+        if len(frames) % 10 == 0:
+            print(f"  {len(frames)}/{max_frames}...")
+    
+    cap.release()
+    print(f"Extracted {len(frames)} frames")
+    return frames
 
-files2 = os.listdir('imgs')
+def generate_asm(frames, name):
+    """Generate assembly source."""
+    n = len(frames)
+    
+    asm = f"""; Video: {n} frames, {FRAME_WIDTH}x{FRAME_HEIGHT}, scale {SCALE_FACTOR}x
 
-#GET ALL FILES .H AND .C
-for i in files2:
-    destination = "build//src//gfx"
-    if '.h' in i or 'c' in i or 'gfx' in i:
-        try:
-            shutil.move("imgs//%s" %i, destination)
-        except:
-            mypath = "build//src//gfx"
-            print("[WARNING] GFX NOT EMPTY  ! FORMATING ...")
-            debug.append("[WARNING] GFX NOT EMPTY  ! FORMATING ...")
-            for root, dirs, files in os.walk(mypath):
-                for file in files:
-                    os.remove(os.path.join(root, file))
-            shutil.move("imgs//%s" %i, destination)
+	include 'include/ez80.inc'
+	include 'include/tiformat.inc'
+	include 'include/ti84pceg.inc'
+
+	format ti executable '{name}'
+
+	call	ti.RunIndicOff
+	di
+
+; 1555 palette
+	ld	hl, ti.mpLcdPalette
+	ld	b, 0
+.pal:
+	ld	d, b
+	ld	a, b
+	and	a, 192
+	srl	d
+	rra
+	ld	e, a
+	ld	a, 31
+	and	a, b
+	or	a, e
+	ld	(hl), a
+	inc	hl
+	ld	(hl), d
+	inc	hl
+	inc	b
+	jr	nz, .pal
+
+	call	ti.boot.ClearVRAM
+	ld	a, ti.lcdBpp8
+	ld	(ti.mpLcdCtrl), a
+
+main:
+	ld	hl, frames
+	ld	a, {n}
+	ld	(cnt), a
+.loop:
+	push	hl
+	call	draw
+	pop	hl
+	ld	de, {FRAME_WIDTH * FRAME_HEIGHT}
+	add	hl, de
+	ld	bc, $4000
+.dly:
+	dec	bc
+	ld	a, b
+	or	a, c
+	jr	nz, .dly
+	ld	a, (ti.kbdG6)
+	bit	ti.kbitClear, a
+	jr	nz, quit
+	ld	a, (cnt)
+	dec	a
+	ld	(cnt), a
+	jr	nz, .loop
+	jr	main
+
+cnt:
+	db	0
+
+quit:
+	call	ti.ClrScrn
+	ld	a, ti.lcdBpp16
+	ld	(ti.mpLcdCtrl), a
+	call	ti.DrawStatusBar
+	ei
+	ret
+
+draw:
+	ld	de, ti.vRam
+	ld	a, {FRAME_HEIGHT}
+.row:
+	push	af
+	ld	b, {SCALE_FACTOR}
+.vr:
+	push	bc
+	push	hl
+	ld	c, {FRAME_WIDTH}
+.px:
+	ld	a, (hl)
+	inc	hl
+	ld	b, {SCALE_FACTOR}
+.hr:
+	ld	(de), a
+	inc	de
+	djnz	.hr
+	dec	c
+	jr	nz, .px
+	pop	hl
+	pop	bc
+	djnz	.vr
+	push	de
+	ld	de, {FRAME_WIDTH}
+	add	hl, de
+	pop	de
+	pop	af
+	dec	a
+	jr	nz, .row
+	ret
+
+frames:
+"""
+    
+    for i, f in enumerate(frames):
+        asm += f"; F{i}\n"
+        data = f.flatten().tolist()
+        for j in range(0, len(data), 16):
+            asm += "\tdb\t" + ",".join(f"${x:02X}" for x in data[j:j+16]) + "\n"
+    
+    return asm
+
+def main():
+    global FRAME_WIDTH, FRAME_HEIGHT, SCALE_FACTOR
+    
+    print("=" * 50)
+    print("  VIDEO → TI-83 PCE (COLOR)")
+    print("=" * 50)
+    
+    video = input("Video file: ").strip()
+    if not os.path.exists(video):
+        print("File not found!")
+        return 1
+    
+    name = input("Program name [MYVIDEO]: ").strip().upper()[:8] or "MYVIDEO"
+    
+    print("\nResolution:")
+    print("  1) 40x30  (scale 8x) - ~50 frames")
+    print("  2) 64x48  (scale 5x) - ~19 frames")
+    print("  3) 80x60  (scale 4x) - ~12 frames")
+    r = input("Choice [1]: ").strip()
+    
+    if r == "2":
+        FRAME_WIDTH, FRAME_HEIGHT, SCALE_FACTOR = 64, 48, 5
+    elif r == "3":
+        FRAME_WIDTH, FRAME_HEIGHT, SCALE_FACTOR = 80, 60, 4
     else:
-        pass    
-#CODE FOR COMPILATION
-startcode = '''#include <tice.h>
-#include <graphx.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <keypadc.h>
+        FRAME_WIDTH, FRAME_HEIGHT, SCALE_FACTOR = 40, 30, 8
+    
+    mf = input("Max frames [auto]: ").strip()
+    max_frames = int(mf) if mf.isdigit() else None
+    
+    print()
+    frames = extract_frames(video, max_frames)
+    if not frames:
+        return 1
+    
+    print("Generating ASM...")
+    asm = generate_asm(frames, name)
+    
+    out_dir = Path("output")
+    out_dir.mkdir(exist_ok=True)
+    
+    asm_file = out_dir / f"{name.lower()}.asm"
+    with open(asm_file, "w") as f:
+        f.write(asm)
+    print(f"Saved: {asm_file}")
 
-#include "gfx/gfx.h"
+    fasmg = "./fasmg" if os.name != "nt" else "fasmg.exe"
+    out_8xp = out_dir / f"{name.lower()}.8xp"
+    
+    try:
+        result = subprocess.run([fasmg, str(asm_file), str(out_8xp)],
+                               capture_output=True, text=True, timeout=60)
+        if result.returncode == 0:
+            print(f"\n✓ SUCCESS: {out_8xp}")
+            print(f"\nTransfer {name}.8xp to calculator")
+            print(f"Run: Asm(prgm{name})")
+        else:
+            print(f"Compilation error: {result.stderr}")
+    except FileNotFoundError:
+        print(f"\nfasmg not found. Compile manually:")
+        print(f"  fasmg {asm_file} {out_8xp}")
+    
+    return 0
 
-int main(void)
-{
-	uint8_t key;
-	key = kb_ScanGroup(kb_group_6);
-	os_ClrHome();
-	gfx_Begin();
-	gfx_SetPalette(global_palette, sizeof_global_palette, 0);
-	gfx_SetTransparentColor(0);
-    gfx_FillScreen(1);
-	while(kb_ScanGroup(kb_group_1) != kb_2nd) {
-'''
-
-k = DELAY_BETWEEN_PICTURES
-
-ende = '''		}
-		gfx_End();
-		prgm_CleanUp();
-    }'''
-MAIN = open("build//src//main.c", 'w')
-MAIN.write(startcode)
-print("[INFO] Writting main.c")
-debug.append("[INFO] Writting main.c")
-for i in range(0, count):
-    #CODE FOR U R PICTURES
-    MAIN.write("        gfx_ScaledSprite_NoClip(ti%s, 25, 15, %d, %d);\n" % (i, f, f))
-    MAIN.write(f"        delay({k});\n")
-MAIN.write(ende)
-MAIN.close()
-
-#MAKING THE MAKEFILE
-makefile = open("build//makefile", "w")
-makef = f'''NAME        ?= {v}
-COMPRESSED  ?= NO
-ICON        ?= icon.png
-DESCRIPTION ?= "TIGIF BY ALEXDIEU FOR TI83PCE/84PCE"'''
-makefile.write(makef)
-makefile.write("\n\ninclude $(CEDEV)/include/.makefile")
-makefile.close()
-
-workdri = 'build'
-print("[INFO] BUIDLING ...")
-debug.append("[INFO] BUIDLING ...")
-#CALLING TO COMPILE THE PROGRAM TO BIN THEN TO 8XP
-subprocess.check_call(['make2.exe'], cwd=workdri)
-
-BINARIES = "build//bin"
-
-BINARIESLIST = os.listdir(BINARIES)
-
-debuge = open('DEBUG//DEBUG-LOG(%s_%s_%s).txt' % (now.minute, now.hour, now.day),'w')
-       
-#GETTING THE 8XP AND MOVING IT
-for i in BINARIESLIST:
-    destination = "8xp-progs"
-    if ".8xp":
-        try:
-            shutil.move("build//bin//%s" %i, destination)
-        except:
-            print("[ERROR] COMPILATION FAILED !")
-            for element in debug:
-                debuge.write(element)
-                debuge.write('\n')
-            debuge.close()  
-            exit()
-
-#WRITTING DEBUG
-print("[INFO] Writting debug log")
-debug.append("[INFO] Writting debug log")
-debug.append("[INFO] DONE")
-for element in debug:
-     debuge.write(element)
-     debuge.write('\n')
-debuge.close()  
-input("DONE !")
+if __name__ == "__main__":
+    sys.exit(main())
